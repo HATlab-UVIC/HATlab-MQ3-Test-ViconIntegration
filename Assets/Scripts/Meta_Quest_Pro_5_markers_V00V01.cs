@@ -21,9 +21,10 @@ namespace UnityVicon
         public string SegmentName;
         public Transform headset;
 
-        private bool IsScaled = true;
-        private uint NumberOfMarkers;
-        private bool MarkerEnabled = false;
+        bool IsScaled = true;
+        uint NumberOfMarkers;
+        bool MarkerEnabled = false;
+        [SerializeField] bool isRoot = false;
 
         public ViconDataStreamClient Client;
 
@@ -34,6 +35,12 @@ namespace UnityVicon
         void Start()
         {
             Application.targetFrameRate = 60;
+            GameEvents.OnCalibrationInvoked += Calibrate;
+        }
+
+        void OnDestroy()
+        {
+            GameEvents.OnCalibrationInvoked -= Calibrate;
         }
 
         void Update()
@@ -86,7 +93,15 @@ namespace UnityVicon
             }
         }*/
 
-        private void FindAndTransformMarker(Transform root, string MarkerName)
+        void Calibrate(Vector3 position, Quaternion rotation)
+        {
+            if (MarkerEnabled)
+            {
+                Debug.LogError("Calibrate!");
+            }
+        }
+
+        void FindAndTransformMarker(Transform root, string MarkerName)
         {
             if (root.gameObject.name == MarkerName)
             {
@@ -131,7 +146,7 @@ namespace UnityVicon
         }
         // map the orientation back for forward
 
-        private void ApplyBoneTransform(Transform Bone)
+        void ApplyBoneTransform(Transform Bone)
         {
             string BoneName = strip(Bone.gameObject.name);
             // update the bone transform from the data stream
