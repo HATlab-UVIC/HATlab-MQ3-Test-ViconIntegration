@@ -17,9 +17,9 @@ namespace UnityVicon
     /// </summary>
     public class Meta_Quest_Pro_5_markers_V00V01 : MonoBehaviour
     {
-        public string SubjectName;
-        public string SegmentName;
-        public Transform headset;
+        [SerializeField] string SubjectName;
+        [SerializeField] string SegmentName;
+        [SerializeField] Transform headset;
 
         bool IsScaled = true;
         uint NumberOfMarkers;
@@ -55,12 +55,11 @@ namespace UnityVicon
             List<Output_GetMarkerName> OGMN = new List<Output_GetMarkerName>();
             Debug.Log("numberOfMarkers: " + NumberOfMarkers);
 
-            Transform Root = transform.root;
             // Use FindAndTransform instead of FindAndTransformMarker for tracking segments instead of markers
             // FindAndTransform(Root, OGSRSN.SegmentName);
             for (uint i = 0; i < NumberOfMarkers; i++)
             {
-                FindAndTransformMarker(Root, strip(Client.GetMarkerNameFromIndex(SubjectName, i)));
+                FindAndTransformMarker(headset, strip(Client.GetMarkerNameFromIndex(SubjectName, i)));
             }
         }
 
