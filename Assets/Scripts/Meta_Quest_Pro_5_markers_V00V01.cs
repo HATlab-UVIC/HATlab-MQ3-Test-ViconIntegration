@@ -8,7 +8,6 @@ using System.IO;
 using ViconDataStreamSDK.CSharp;
 using Unity.VisualScripting;
 using UnityEngine.XR;
-using UnityEngine.Profiling;
 
 namespace UnityVicon
 {
@@ -59,12 +58,10 @@ namespace UnityVicon
             Transform Root = transform.root;
             // Use FindAndTransform instead of FindAndTransformMarker for tracking segments instead of markers
             // FindAndTransform(Root, OGSRSN.SegmentName);
-            Profiler.BeginSample("FindAndTransformMarker");
             for (uint i = 0; i < NumberOfMarkers; i++)
             {
                 FindAndTransformMarker(Root, strip(Client.GetMarkerNameFromIndex(SubjectName, i)));
             }
-            Profiler.EndSample();
         }
 
         /*void FindAndTransform(Transform iTransform, string BoneName)
