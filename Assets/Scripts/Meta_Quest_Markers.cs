@@ -15,32 +15,31 @@ namespace UnityVicon
     ///  Track "Meta_Quest_Pro_5_markers_V00" subject with "HMD" segment by individual markers
     ///  Maximum fps fixed at 60 fps. ViconDataStreamClient.cs adjusted for this use
     /// </summary>
-    public class Meta_Quest_Pro_5_markers_V00V01 : MonoBehaviour
+    public class Meta_Quest_Markers : MonoBehaviour
     {
+        public bool isRoot = false;
+        public uint NumberOfMarkers;
+
         [SerializeField] string SubjectName;
         [SerializeField] string SegmentName;
         [SerializeField] Transform headset;
 
         bool IsScaled = true;
-        uint NumberOfMarkers;
         bool MarkerEnabled = false;
-        [SerializeField] bool isRoot = false;
 
         public ViconDataStreamClient Client;
 
-        public Meta_Quest_Pro_5_markers_V00V01()
+        public Meta_Quest_Markers()
         {
         }
 
         void Start()
         {
             Application.targetFrameRate = 60;
-            GameEvents.OnCalibrationInvoked += Calibrate;
         }
 
         void OnDestroy()
         {
-            GameEvents.OnCalibrationInvoked -= Calibrate;
         }
 
         void Update()
@@ -91,15 +90,6 @@ namespace UnityVicon
                 }
             }
         }*/
-
-        void Calibrate(Vector3 position, Quaternion rotation)
-        {
-            if (MarkerEnabled)
-            {
-                Debug.LogError("Calibrate!");
-            }
-        }
-
         void FindAndTransformMarker(Transform root, string MarkerName)
         {
             if (root.gameObject.name == MarkerName)
