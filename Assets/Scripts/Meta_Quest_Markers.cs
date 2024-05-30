@@ -17,15 +17,24 @@ namespace UnityVicon
     /// </summary>
     public class Meta_Quest_Markers : MonoBehaviour
     {
-        public bool isRoot = false;
-        public uint NumberOfMarkers;
+        public bool IsRoot = false;
+
+        [HideInInspector] public Matrix4x4 CalibratedSwizzleMatrix = Matrix4x4.identity;
+        [HideInInspector] public Matrix4x4 CalibratedRotateMatrix = Matrix4x4.identity;
+        [HideInInspector] public Matrix4x4 CalibratedRotateXMatrix = Matrix4x4.identity;
+        [HideInInspector] public Matrix4x4 CalibratedRotateYMatrix = Matrix4x4.identity;
+        [HideInInspector] public Matrix4x4 CalibratedRotateZMatrix = Matrix4x4.identity;
+        [HideInInspector] public uint NumberOfMarkers;
+        
 
         [SerializeField] string SubjectName;
         [SerializeField] string SegmentName;
-        [SerializeField] Transform headset;
+        Transform Headset;
 
         bool IsScaled = true;
         bool MarkerEnabled = false;
+        Vector3 CalibratedPosition = Vector3.one;
+        Quaternion CalibratedRotation = Quaternion.identity;
 
         public ViconDataStreamClient Client;
 
@@ -36,6 +45,7 @@ namespace UnityVicon
         void Start()
         {
             Application.targetFrameRate = 60;
+            Headset = transform;
         }
 
         void OnDestroy()
@@ -58,8 +68,18 @@ namespace UnityVicon
             // FindAndTransform(Root, OGSRSN.SegmentName);
             for (uint i = 0; i < NumberOfMarkers; i++)
             {
-                FindAndTransformMarker(headset, strip(Client.GetMarkerNameFromIndex(SubjectName, i)));
+                FindAndTransformMarker(Headset, strip(Client.GetMarkerNameFromIndex(SubjectName, i)));
             }
+        }
+
+        public void CalibratePosition(Vector3 position)
+        {
+            CalibratedPosition = position;
+        }
+
+        public void CalibrateRotation(Quaternion rotation)
+        {
+            CalibratedRotation = rotation;
         }
 
         /*void FindAndTransform(Transform iTransform, string BoneName)
@@ -94,7 +114,14 @@ namespace UnityVicon
         {
             if (root.gameObject.name == MarkerName)
             {
-                root.position = Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName);
+                // root.position = CalibratedRotateMatrix.MultiplyPoint3x4( CalibratedSwizzleMatrix.MultiplyPoint3x4( Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName) ) );
+                // root.position = CalibratedRotateMatrix.MultiplyPoint3x4( Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName) );
+                root.position = CalibratedSwizzleMatrix.MultiplyPoint3x4( Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName) );
+                root.position = 
+                    CalibratedRotateZMatrix.MultiplyPoint3x4(
+                    CalibratedRotateYMatrix.MultiplyPoint3x4(
+                    CalibratedRotateXMatrix.MultiplyPoint3x4(
+                    CalibratedSwizzleMatrix.MultiplyPoint3x4( Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName) ) ) ) );
                 double[] rot = Client.GetSegmentRotation(SubjectName, SegmentName).Rotation;
                 root.rotation = new Quaternion((float)rot[0], (float)rot[1], (float)rot[2], (float)rot[3]);
                 double[] scale = Client.GetSegmentScale(SubjectName, SegmentName).Scale;
@@ -166,7 +193,7 @@ namespace UnityVicon
             {
                 //Vector3 Translate = new Vector3(-(float)OTran.Translation[2] * 0.001f, -(float)OTran.Translation[0] * 0.001f, (float)OTran.Translation[1] * 0.001f);
                 Vector3 Translate = new Vector3((float)OTran.Translation[0] * 0.001f, (float)OTran.Translation[1] * 0.001f, (float)OTran.Translation[2] * 0.001f);
-                Bone.localPosition = new Vector3(-Translate.x, Translate.y, Translate.z);
+                Bone.localPosition = new Vector4(-Translate.x, Translate.y, Translate.z, 1);
             }
 
             // If there's a scale for this subject in the datastream, apply it here.

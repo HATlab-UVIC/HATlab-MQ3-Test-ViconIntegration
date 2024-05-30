@@ -512,11 +512,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2472c980facda9849b1781db6d8ca213, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isRoot: 0
+  IsRoot: 0
+  CalibratedSwizzleMatrix:
+    e00: 1
+    e01: 0
+    e02: 0
+    e03: 0
+    e10: 0
+    e11: 1
+    e12: 0
+    e13: 0
+    e20: 0
+    e21: 0
+    e22: 1
+    e23: 0
+    e30: 0
+    e31: 0
+    e32: 0
+    e33: 1
+  CalibratedRotateMatrix:
+    e00: 1
+    e01: 0
+    e02: 0
+    e03: 0
+    e10: 0
+    e11: 1
+    e12: 0
+    e13: 0
+    e20: 0
+    e21: 0
+    e22: 1
+    e23: 0
+    e30: 0
+    e31: 0
+    e32: 0
+    e33: 1
   NumberOfMarkers: 0
   SubjectName: Meta_Quest_Pro_V00
   SegmentName: HMD
-  headset: {fileID: 1131741199}
+  Headset: {fileID: 1480646421}
   Client: {fileID: 1383701795}
 --- !u!1001 &1160299847
 PrefabInstance:
@@ -652,6 +686,7 @@ MonoBehaviour:
   TrackedMetaQuestSubjects:
   - {fileID: 1131741200}
   - {fileID: 1914773764}
+  CenterEyeAnchor: {fileID: 1480646421}
 --- !u!1 &1232912915
 GameObject:
   m_ObjectHideFlags: 0
@@ -1000,6 +1035,11 @@ MonoBehaviour:
   _whenSelectingInteractorViewRemoved:
     m_PersistentCalls:
       m_Calls: []
+--- !u!4 &1480646421 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2483171112402263012, guid: f54012181eacade4ea242c65f804720f, type: 3}
+  m_PrefabInstance: {fileID: 1160299847}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1562187170 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8149640132073612291, guid: 5fca3702cdf1a214a94e69dcfa704e17, type: 3}
@@ -1494,11 +1534,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2472c980facda9849b1781db6d8ca213, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isRoot: 1
+  IsRoot: 1
+  CalibratedSwizzleMatrix:
+    e00: 1
+    e01: 0
+    e02: 0
+    e03: 0
+    e10: 0
+    e11: 1
+    e12: 0
+    e13: 0
+    e20: 0
+    e21: 0
+    e22: 1
+    e23: 0
+    e30: 0
+    e31: 0
+    e32: 0
+    e33: 1
+  CalibratedRotateMatrix:
+    e00: 1
+    e01: 0
+    e02: 0
+    e03: 0
+    e10: 0
+    e11: 1
+    e12: 0
+    e13: 0
+    e20: 0
+    e21: 0
+    e22: 1
+    e23: 0
+    e30: 0
+    e31: 0
+    e32: 0
+    e33: 1
   NumberOfMarkers: 0
   SubjectName: Meta_Quest_3_V00
   SegmentName: HMD
-  headset: {fileID: 1914773763}
+  Headset: {fileID: 1480646421}
   Client: {fileID: 1383701795}
 --- !u!1 &1998480224
 GameObject:
