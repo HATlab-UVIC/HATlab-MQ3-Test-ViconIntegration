@@ -19,12 +19,14 @@ namespace UnityVicon
     {
         public bool IsRoot = false;
 
-        [HideInInspector] public Matrix4x4 CalibratedSwizzleMatrix = Matrix4x4.identity;
-        [HideInInspector] public Matrix4x4 CalibratedRotateMatrix = Matrix4x4.identity;
-        [HideInInspector] public Matrix4x4 CalibratedRotateXMatrix = Matrix4x4.identity;
-        [HideInInspector] public Matrix4x4 CalibratedRotateYMatrix = Matrix4x4.identity;
-        [HideInInspector] public Matrix4x4 CalibratedRotateZMatrix = Matrix4x4.identity;
+        [HideInInspector] public Matrix4x4 CalibrateSwizzleMatrix = Matrix4x4.identity;
+        [HideInInspector] public Matrix4x4 CalibrateRotateXMatrix = Matrix4x4.identity;
+        [HideInInspector] public Matrix4x4 CalibrateRotateYMatrix = Matrix4x4.identity;
+        [HideInInspector] public Matrix4x4 CalibrateRotateZMatrix = Matrix4x4.identity;
+        [HideInInspector] public Matrix4x4 CalibrateScaleMatrix = Matrix4x4.identity;
+        [HideInInspector] public Vector3 CalibrateTransformMatrix = Vector3.zero;
         [HideInInspector] public uint NumberOfMarkers;
+        [HideInInspector] public Dictionary<string, Vector3> GlobalMarkerPositions = new Dictionary<string, Vector3>();
         
 
         [SerializeField] string SubjectName;
@@ -78,11 +80,21 @@ namespace UnityVicon
                 // root.position = CalibratedRotateMatrix.MultiplyPoint3x4( CalibratedSwizzleMatrix.MultiplyPoint3x4( Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName) ) );
                 // root.position = CalibratedRotateMatrix.MultiplyPoint3x4( Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName) );
                 // root.position = CalibratedSwizzleMatrix.MultiplyPoint3x4( Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName) );
-                root.position = 
-                    CalibratedRotateZMatrix.MultiplyPoint3x4(
-                    CalibratedRotateYMatrix.MultiplyPoint3x4(
-                    CalibratedRotateXMatrix.MultiplyPoint3x4(
-                    CalibratedSwizzleMatrix.MultiplyPoint3x4( Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName) ) ) ) );
+                root.position =
+                    CalibrateScaleMatrix.MultiplyPoint3x4(
+                    CalibrateRotateZMatrix.MultiplyPoint3x4(
+                    CalibrateRotateYMatrix.MultiplyPoint3x4(
+                    CalibrateRotateXMatrix.MultiplyPoint3x4(
+                    CalibrateSwizzleMatrix.MultiplyPoint3x4( Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName) ) ) ) ) ) + CalibrateTransformMatrix;
+                try
+                {
+                    GlobalMarkerPositions.Add(MarkerName, Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName));
+                }
+                catch (ArgumentException e)
+                {
+                    GlobalMarkerPositions[MarkerName] = Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName);
+                }
+
                 double[] rot = Client.GetSegmentRotation(SubjectName, SegmentName).Rotation;
                 root.rotation = new Quaternion((float)rot[0], (float)rot[1], (float)rot[2], (float)rot[3]);
                 double[] scale = Client.GetSegmentScale(SubjectName, SegmentName).Scale;
@@ -127,9 +139,9 @@ namespace UnityVicon
             string BoneName = strip(Bone.gameObject.name);
             // update the bone transform from the data stream
             Output_GetSegmentLocalRotationQuaternion ORot = Client.GetSegmentRotation(SubjectName, BoneName);
-            Debug.Log("Result: " + ORot.Result + " SubjectName:" + SubjectName);
-            Debug.Log("Segment Name:" + BoneName);
-            Debug.Log("Debug:" + "," + (float)ORot.Rotation[0] + "," + (float)ORot.Rotation[1] + "," + (float)ORot.Rotation[2] + "," + (float)ORot.Rotation[3]);
+            // Debug.Log("Result: " + ORot.Result + " SubjectName:" + SubjectName);
+            // Debug.Log("Segment Name:" + BoneName);
+            // Debug.Log("Debug:" + "," + (float)ORot.Rotation[0] + "," + (float)ORot.Rotation[1] + "," + (float)ORot.Rotation[2] + "," + (float)ORot.Rotation[3]);
             if (ORot.Result == Result.Success)
             {
                 // mapping back to default data stream axis
