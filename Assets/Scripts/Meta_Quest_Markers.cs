@@ -12,7 +12,7 @@ using UnityEngine.XR;
 namespace UnityVicon
 {
     /// <summary>
-    ///  Track "Meta_Quest_Pro_5_markers_V00" subject with "HMD" segment by individual markers
+    ///  Track subject with "HMD" segment by individual markers
     ///  Maximum fps fixed at 60 fps. ViconDataStreamClient.cs adjusted for this use
     /// </summary>
     public class Meta_Quest_Markers : MonoBehaviour
@@ -62,61 +62,22 @@ namespace UnityVicon
             else {MarkerEnabled = true;}
             Output_GetSubjectRootSegmentName OGSRSN = Client.GetSubjectRootSegmentName(SubjectName);
             List<Output_GetMarkerName> OGMN = new List<Output_GetMarkerName>();
-            Debug.Log("numberOfMarkers: " + NumberOfMarkers);
+            // Debug.Log("numberOfMarkers: " + NumberOfMarkers);
 
             // Use FindAndTransform instead of FindAndTransformMarker for tracking segments instead of markers
-            // FindAndTransform(Root, OGSRSN.SegmentName);
             for (uint i = 0; i < NumberOfMarkers; i++)
             {
                 FindAndTransformMarker(Headset, strip(Client.GetMarkerNameFromIndex(SubjectName, i)));
             }
         }
 
-        public void CalibratePosition(Vector3 position)
-        {
-            CalibratedPosition = position;
-        }
-
-        public void CalibrateRotation(Quaternion rotation)
-        {
-            CalibratedRotation = rotation;
-        }
-
-        /*void FindAndTransform(Transform iTransform, string BoneName)
-        {
-            // Debug.Log(BoneName);
-            if (BoneName == "HMD")
-            {
-                Debug.Log("Debug");
-                Transform HeadsetTransform = headset;
-                ApplyBoneTransform(HeadsetTransform);
-                //TransformChildren(HeadsetTransform);
-                // Debug.Log(Child.position);
-            }
-            else
-            {
-                int ChildCount = iTransform.childCount;
-                for (int i = 0; i < ChildCount; ++i)
-                {
-                    Transform Child = iTransform.GetChild(i);
-                    if (strip(Child.name) == BoneName)
-                    {
-                        ApplyBoneTransform(Child);
-                        TransformChildren(Child);
-                        break;
-                    }
-                    // if not finding root in this layer, try the children
-                    FindAndTransform(Child, BoneName);
-                }
-            }
-        }*/
         void FindAndTransformMarker(Transform root, string MarkerName)
         {
             if (root.gameObject.name == MarkerName)
             {
                 // root.position = CalibratedRotateMatrix.MultiplyPoint3x4( CalibratedSwizzleMatrix.MultiplyPoint3x4( Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName) ) );
                 // root.position = CalibratedRotateMatrix.MultiplyPoint3x4( Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName) );
-                root.position = CalibratedSwizzleMatrix.MultiplyPoint3x4( Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName) );
+                // root.position = CalibratedSwizzleMatrix.MultiplyPoint3x4( Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName) );
                 root.position = 
                     CalibratedRotateZMatrix.MultiplyPoint3x4(
                     CalibratedRotateYMatrix.MultiplyPoint3x4(
@@ -131,7 +92,6 @@ namespace UnityVicon
             else
             {
                 int childCount = root.childCount;
-                Debug.Log("Recursive child count: " + childCount);
                 for (int i = 0; i < childCount; i++)
                 {
                     // target not found. Recursively search
@@ -173,7 +133,6 @@ namespace UnityVicon
             if (ORot.Result == Result.Success)
             {
                 // mapping back to default data stream axis
-                //Quaternion Rot = new Quaternion(-(float)ORot.Rotation[2], -(float)ORot.Rotation[0], (float)ORot.Rotation[1], (float)ORot.Rotation[3]);
                 Quaternion Rot = new Quaternion((float)ORot.Rotation[0], (float)ORot.Rotation[1], (float)ORot.Rotation[2], (float)ORot.Rotation[3]);
                 // mapping right hand to left hand flipping x
                 Bone.localRotation = new Quaternion(Rot.x, -Rot.y, -Rot.z, Rot.w);

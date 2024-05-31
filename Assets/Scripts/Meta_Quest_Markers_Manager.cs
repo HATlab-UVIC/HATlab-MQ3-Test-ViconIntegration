@@ -34,43 +34,49 @@ public class Meta_Quest_Markers_Manager : MonoBehaviour
 
     public void Calibrate()
     {
-        Debug.LogError("Calibrate");
         foreach (var TrackedSubject in TrackedMetaQuestSubjects)
         {
             if (TrackedSubject.IsRoot)
             {
                 for (int i = 0; i < TrackedSubject.NumberOfMarkers; i ++)
                 {
-                    Debug.LogError($"Root\nMarker number: {i} position: {TrackedSubject.transform.GetChild(i).position} rotation {TrackedSubject.transform.GetChild(i).rotation}");
+                    // Debug.LogError($"Root\nMarker number: {i} position: {TrackedSubject.transform.GetChild(i).position} rotation {TrackedSubject.transform.GetChild(i).rotation}");
                 }
             }
             else
             {
                 for (int i = 0; i < TrackedSubject.NumberOfMarkers; i ++)
                 {
-                    Debug.LogError($"Marker number: {i} position: {TrackedSubject.transform.GetChild(i).position} rotation {TrackedSubject.transform.GetChild(i).rotation}");
+                    // Debug.LogError($"Marker number: {i} position: {TrackedSubject.transform.GetChild(i).position} rotation {TrackedSubject.transform.GetChild(i).rotation}");
                 }
 
             }
         }
-        Vector3 ViconWorldScaleIPD;
+
+        Vector3 ViconWorldScaleIPD; // InterPupillary Distance in Vicon Coordinate System
         Vector3 ViconWorldTransformation;
-        Vector3 RealWorldScaleIPD;
+        Vector3 RealWorldScaleIPD; // InterPupillary Distance in Meta Quest Coordinate System. This is matching the real world coordinate system
         Vector3 RealWorldTransformation;
 
         ViconWorldScaleIPD = Root_Meta_Quest_Marker.transform.GetChild(1).position - Root_Meta_Quest_Marker.transform.GetChild(0).position;
         ViconWorldTransformation = Root_Meta_Quest_Marker.transform.GetChild(1).position - ViconWorldScaleIPD / 2;
-        RealWorldScaleIPD = CenterEyeAnchor.right * 13;
+        RealWorldScaleIPD = CenterEyeAnchor.right * 13; // The distance between marker HMD1 and marker HMD2 is around 13cm
         RealWorldTransformation = CenterEyeAnchor.position;
+
+        // Swizzle Vicon Coordinate System into World Coordinate System
+        ViconWorldScaleIPD = new Vector3(ViconWorldScaleIPD.x, ViconWorldScaleIPD.z, ViconWorldScaleIPD.y);
+        ViconWorldTransformation = new Vector3(ViconWorldTransformation.x, ViconWorldTransformation.z, ViconWorldTransformation.y);
 
         float ViconToWorldScale = 0.13f / ViconWorldScaleIPD.magnitude;
         float angleX, angleY, angleZ;
 
-        angleX = Vector3.Angle(Vector3.Cross( ViconWorldScaleIPD, new Vector3(0, 1, 0) ), new Vector3(1, 0, 0));
-        angleY = Vector3.Angle(Vector3.Cross(ViconWorldScaleIPD, new Vector3(0, 1, 0)), new Vector3(0, 1, 0));
-        angleZ = Vector3.Angle(Vector3.Cross(ViconWorldScaleIPD, new Vector3(0, 1, 0)), new Vector3(0, 0, 1));
+        // Calculate angles in 3 axis between ViconWorldScaleIPD and RealWorldScaleIPD
+        angleX = Vector3.Angle(new Vector3(0, RealWorldScaleIPD.y, RealWorldScaleIPD.z), new Vector3(0, ViconWorldScaleIPD.y, ViconWorldScaleIPD.z)) * Mathf.PI / 180;
+        angleY = - Vector3.Angle(new Vector3(RealWorldScaleIPD.x, 0, RealWorldScaleIPD.z), new Vector3(ViconWorldScaleIPD.x, 0, ViconWorldScaleIPD.z)) * Mathf.PI / 180;
+        angleZ = Vector3.Angle(new Vector3(RealWorldScaleIPD.x, RealWorldScaleIPD.y, 0), new Vector3(ViconWorldScaleIPD.x, ViconWorldScaleIPD.y, 0)) * Mathf.PI / 180;
 
-        Debug.LogError($"angleX: {angleX}\nangleY: {angleY}\nangleZ: {angleZ}");
+        // Debug.LogError($"ViconWorldScaleIPD: {ViconWorldScaleIPD.normalized} RealWorldScaleIPD: {RealWorldScaleIPD.normalized}");
+        // Debug.LogError($"angleX: {angleX * 180 / Mathf.PI} angleY: {angleY * 180 / Mathf.PI} angleZ: {angleZ * 180 / Mathf.PI}");
 
         Matrix4x4 TranslateViconToOrigin = new Matrix4x4();
         TranslateViconToOrigin.SetColumn(0, new Vector4(1, 0, 0, - ViconWorldTransformation.x));
@@ -90,68 +96,41 @@ public class Meta_Quest_Markers_Manager : MonoBehaviour
         SwizzleYandZ.SetColumn(2, new Vector4(0, 1, 0, 0));
         SwizzleYandZ.SetColumn(3, new Vector4(0, 0, 0, 1));
 
+
+        // Rotational 4x4 Matrix transformation. This will cause gimbal lock sometime
         Matrix4x4 RotateX = new Matrix4x4();
-        RotateX.SetColumn(0, new Vector4(1, 0, 0, 0));
-        RotateX.SetColumn(1, new Vector4(0, Mathf.Cos(angleX), Mathf.Sin(angleX), 0));
-        RotateX.SetColumn(2, new Vector4(0, Mathf.Sin(angleX), Mathf.Cos(angleX), 0));
-        RotateX.SetColumn(3, new Vector4(0, 0, 0, 1));
+        RotateX.SetColumn(0, new Vector4(1,                     0,                      0,                      0));
+        RotateX.SetColumn(1, new Vector4(0,                     Mathf.Cos(angleX),      - Mathf.Sin(angleX),    0));
+        RotateX.SetColumn(2, new Vector4(0,                     Mathf.Sin(angleX),      Mathf.Cos(angleX),      0));
+        RotateX.SetColumn(3, new Vector4(0,                     0,                      0,                      1));
 
         Matrix4x4 RotateY = new Matrix4x4();
-        RotateY.SetColumn(0, new Vector4(Mathf.Cos(angleY), 0, Mathf.Sin(angleY), 0));
-        RotateY.SetColumn(1, new Vector4(0, 1, 0, 0));
-        RotateY.SetColumn(2, new Vector4(-Mathf.Sin(angleZ), 0, 0));
-        RotateY.SetColumn(3, new Vector4(0, 0, 0, 1));
+        RotateY.SetColumn(0, new Vector4(Mathf.Cos(angleY),     0,                      Mathf.Sin(angleY),      0));
+        RotateY.SetColumn(1, new Vector4(0,                     1,                      0,                      0));
+        RotateY.SetColumn(2, new Vector4(- Mathf.Sin(angleY),   0,                      Mathf.Cos(angleY),      0));
+        RotateY.SetColumn(3, new Vector4(0,                     0,                      0,                      1));
 
         Matrix4x4 RotateZ = new Matrix4x4();
-        RotateZ.SetColumn(0, new Vector4(Mathf.Cos(angleZ), -Mathf.Sin(angleZ), 0, 0));
-        RotateZ.SetColumn(1, new Vector4(Mathf.Sin(angleZ), Mathf.Cos(angleZ), 0, 0));
-        RotateZ.SetColumn(2, new Vector4(0, 0, 1, 0));
-        RotateZ.SetColumn(3, new Vector4(0, 0, 0, 1));
+        RotateZ.SetColumn(0, new Vector4(Mathf.Cos(angleZ),     - Mathf.Sin(angleZ),    0,                      0));
+        RotateZ.SetColumn(1, new Vector4(Mathf.Sin(angleZ),     Mathf.Cos(angleZ),      0,                      0));
+        RotateZ.SetColumn(2, new Vector4(0,                     0,                      1,                      0));
+        RotateZ.SetColumn(3, new Vector4(0,                     0,                      0,                      1));
 
-        Matrix4x4 RotateYby90 = new Matrix4x4();
-        RotateYby90.SetColumn(0, new Vector4(0, -1, 0, 0));
-        RotateYby90.SetColumn(1, new Vector4(1, 0, 0, 0));
-        RotateYby90.SetColumn(2, new Vector4(0, 0, 1, 0));
-        RotateYby90.SetColumn(3, new Vector4(0, 0, 0, 1));
-
-        Debug.LogError($"Calibrate Rotation Matrix \n{RotateZ * (RotateY * RotateX)}");
+        // Debug.LogError($"Calibrate Rotation Matrix \n{RotateZ * (RotateY * RotateX)}");
+        // Debug.LogError($"RotateY Matrix \n{RotateY}");
 
         // need to rotate and scale
 
 
-        /*Vector3 axis = Vector3.Cross(ViconWorldScaleIPD.normalized, RealWorldScaleIPD.normalized);
-        float angle = Mathf.Acos(Vector3.Dot(ViconWorldScaleIPD, RealWorldScaleIPD)) * Mathf.Rad2Deg;
-        Quaternion rotation = Quaternion.AngleAxis(angle, axis);
-        Matrix4x4 transformMatrix = Matrix4x4.TRS(Vector3.zero, rotation, Vector3.one);
-        Root_Meta_Quest_Marker.CalibratedTransformMatrix = transformMatrix;*/
-
-        /*foreach (var TrackedSubject in TrackedMetaQuestSubjects)
-        {
-            if (TrackedSubject.IsRoot)
-            {
-                for (int i = 0; i < TrackedSubject.NumberOfMarkers; i++)
-                {
-                    Debug.LogError($"Root\nMarker number: {i} position: {TrackedSubject.transform.GetChild(i).position} rotation {TrackedSubject.transform.GetChild(i).rotation}");
-                }
-            }
-            else
-            {
-                for (int i = 0; i < TrackedSubject.NumberOfMarkers; i++)
-                {
-                    Debug.LogError($"Marker number: {i} position: {TrackedSubject.transform.GetChild(i).position} rotation {TrackedSubject.transform.GetChild(i).rotation}");
-                }
-
-            }
-        }*/
 
 
         foreach (var TrackedSubject in TrackedMetaQuestSubjects)
         {
             TrackedSubject.CalibratedSwizzleMatrix = SwizzleYandZ;
-            TrackedSubject.CalibratedRotateMatrix = RotateZ * (RotateY * RotateX);
-            TrackedSubject.CalibratedRotateXMatrix = RotateX;
+            // TrackedSubject.CalibratedRotateMatrix = RotateZ * (RotateY * RotateX);
+            // TrackedSubject.CalibratedRotateXMatrix = RotateX;
             TrackedSubject.CalibratedRotateYMatrix = RotateY;
-            TrackedSubject.CalibratedRotateZMatrix = RotateZ;
+            // TrackedSubject.CalibratedRotateZMatrix = RotateZ;
         }
     }
 }
