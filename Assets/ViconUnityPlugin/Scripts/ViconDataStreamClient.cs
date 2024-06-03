@@ -217,6 +217,7 @@ public class ViconDataStreamClient : MonoBehaviour
 
         while (bThreadRunning == true && !m_Client.IsConnected().Connected)
         {
+            m_Client.EnableDeviceData();
             Output_Connect OC = m_Client.Connect(CombinedHostnameString);
             print("Connect result: " + OC.Result);
 
@@ -279,6 +280,26 @@ public class ViconDataStreamClient : MonoBehaviour
             }
             GetNewFrame();
         }
+    }
+
+    public Output_GetDeviceCount GetDeviceCount()
+    {
+        return m_Client.GetDeviceCount();
+    }
+
+    public Output_GetDeviceOutputValue GetDeviceOutputValue(string DeviceName, string DeviceOutputComponentName)
+    {
+        return m_Client.GetDeviceOutputValue(DeviceName, DeviceOutputComponentName);
+    }
+
+    public Output_IsDeviceDataEnabled IsDeviceDataEnabled()
+    {
+        return m_Client.IsDeviceDataEnabled();
+    }
+
+    public Output_EnableDeviceData EnableDeviceData()
+    {
+        return m_Client.EnableDeviceData();
     }
 
     public Output_GetSegmentLocalRotationQuaternion GetSegmentRotation(string SubjectName, string SegmentName)
