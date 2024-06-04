@@ -1,12 +1,16 @@
 {
-    "name": "ViconPluginUtils",
+    "name": "Vicon",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "GUID:13eaf43b3197a2d43a6e637fdf12b7d1",
+        "GUID:6917fa79a89227240a18c7fa8050131b",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [
         "Android"
     ],
-    "allowUnsafeCode": false,
+    "allowUnsafeCode": true,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,

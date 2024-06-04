@@ -3,8 +3,8 @@
     "rootNamespace": "",
     "references": [
         "Unity.XR.OpenVR",
-        "ViconPluginUtils",
-        "UnityEngine.SpatialTracking",
+        "GUID:6917fa79a89227240a18c7fa8050131b",
+        "GUID:ba171b3dd2a51234ab864770f99741a5",
         "UnityEngine.Experimental.XR.Interaction",
         "UnityEngine.Experimental.XR.Interaction.Editor"
     ],
@@ -12,7 +12,7 @@
     "excludePlatforms": [
         "Android"
     ],
-    "allowUnsafeCode": false,
+    "allowUnsafeCode": true,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
