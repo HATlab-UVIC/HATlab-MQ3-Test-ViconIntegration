@@ -2330,6 +2330,14 @@ PrefabInstance:
       propertyPath: m_text
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 678599733181134252, guid: ca0371c6718317d47adf93e0eb68fa38, type: 3}
+      propertyPath: m_overflowMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 678599733181134252, guid: ca0371c6718317d47adf93e0eb68fa38, type: 3}
+      propertyPath: m_VerticalAlignment
+      value: 1024
+      objectReference: {fileID: 0}
     - target: {fileID: 2993146786877616943, guid: ca0371c6718317d47adf93e0eb68fa38, type: 3}
       propertyPath: m_Name
       value: DebugConsoleCanvas
@@ -2400,7 +2408,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3008536145112060371, guid: ca0371c6718317d47adf93e0eb68fa38, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 1.2
+      value: 1.567
       objectReference: {fileID: 0}
     - target: {fileID: 3008536145112060371, guid: ca0371c6718317d47adf93e0eb68fa38, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

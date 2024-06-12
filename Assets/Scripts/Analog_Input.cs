@@ -64,44 +64,48 @@ public class Analog_Input : MonoBehaviour
 
     IEnumerator check()
     {
-        if (Client.IsDeviceDataEnabled().Enabled)
+        while (true)
         {
-            DebugConsole.Log("Device Data is enabled");
-            if (Client.GetDeviceCount().DeviceCount > 0)
+            if (Client.IsDeviceDataEnabled().Enabled)
             {
-                DebugConsole.Log($"Device count is: {Client.GetDeviceCount().DeviceCount}");
-                if (Client.GetDeviceOutputValue(DeviceName, ComponentName).Result == Result.Success)
+                DebugConsole.Log("Device Data is enabled");
+                if (Client.GetDeviceCount().DeviceCount > 0)
                 {
-                    DebugConsole.Success("Client successfully reading device output value");
-                    IsReadingInput = true;
+                    DebugConsole.Log($"Device count is: {Client.GetDeviceCount().DeviceCount}");
+                    if (Client.GetDeviceOutputValue(DeviceName, ComponentName).Result == Result.Success)
+                    {
+                        DebugConsole.Success("Client successfully reading device output value");
+                        IsReadingInput = true;
+                    }
+                    else
+                    {
+                        DebugConsole.Error($"Client unsuccessfully reading device output value.\nGetDeviceOutputValue Result: {Client.GetDeviceOutputValue(DeviceName, ComponentName).Result.ToString()}");
+                        IsReadingInput = false;
+                    }
                 }
                 else
                 {
-                    DebugConsole.Error($"Client unsuccessfully reading device output value.\nGetDeviceOutputValue Result: {Client.GetDeviceOutputValue(DeviceName, ComponentName).Result.ToString()}");
+                    DebugConsole.Log($"Device count is: {Client.GetDeviceCount().DeviceCount}");
                     IsReadingInput = false;
                 }
             }
             else
             {
-                DebugConsole.Log($"Device count is: {Client.GetDeviceCount().DeviceCount}");
                 IsReadingInput = false;
+                DebugConsole.Error("Device Data is not enabled");
+                DebugConsole.Log("Trying enabling Deice Data...");
+                Client.EnableDeviceData();
+                if (Client.IsDeviceDataEnabled().Enabled)
+                {
+                    DebugConsole.Success("Device Data is enabled");
+                }
+                else
+                {
+                    DebugConsole.Error("Device Data is cannot be enabled");
+                }
             }
+
+            yield return new WaitForSeconds(1f);
         }
-        else
-        {
-            IsReadingInput = false;
-            DebugConsole.Error("Device Data is not enabled");
-            DebugConsole.Log("Trying enabling Deice Data...");
-            Client.EnableDeviceData();
-            if (Client.IsDeviceDataEnabled().Enabled)
-            {
-                DebugConsole.Success("Device Data is enabled");
-            }
-            else
-            {
-                DebugConsole.Error("Device Data is cannot be enabled");
-            }
-        }
-        yield return new WaitForSeconds(1f);
     }
 }
