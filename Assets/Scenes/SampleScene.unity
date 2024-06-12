@@ -2326,6 +2326,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 678599733181134252, guid: ca0371c6718317d47adf93e0eb68fa38, type: 3}
+      propertyPath: m_text
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 2993146786877616943, guid: ca0371c6718317d47adf93e0eb68fa38, type: 3}
       propertyPath: m_Name
       value: DebugConsoleCanvas
@@ -2409,6 +2413,10 @@ PrefabInstance:
     - target: {fileID: 3008536145112060371, guid: ca0371c6718317d47adf93e0eb68fa38, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3144135963718891246, guid: ca0371c6718317d47adf93e0eb68fa38, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8675316027173983646, guid: ca0371c6718317d47adf93e0eb68fa38, type: 3}
       propertyPath: m_Camera
