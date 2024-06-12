@@ -26,7 +26,6 @@ public class Meta_Quest_Markers_Manager : MonoBehaviour
 
     void Start()
     {
-        GameEvents.OnCalibrationInvoked += Calibrate;
         foreach (var TrackedSubject in TrackedMetaQuestSubjects)
         {
             if (TrackedSubject.IsRoot)
@@ -35,14 +34,18 @@ public class Meta_Quest_Markers_Manager : MonoBehaviour
                 break;
             }
         }
-        if (Root_Meta_Quest_Marker == null) Debug.LogError("There is no Root in Tracked Meta Quest Subjects");
+        if (Root_Meta_Quest_Marker == null) DebugConsole.Error("There is no Root in Tracked Meta Quest Subjects");
     }
 
-    void OnDestroy()
+    void OnEnable()
+    {
+        GameEvents.OnCalibrationInvoked += Calibrate;
+    }
+
+    void OnDisable()
     {
         GameEvents.OnCalibrationInvoked -= Calibrate;
     }
-
 
     public void Calibrate()
     {

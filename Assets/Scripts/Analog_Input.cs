@@ -35,6 +35,7 @@ public class Analog_Input : MonoBehaviour
         }
         else
         {
+            DebugConsole.Error("Client Device Data is not enabled");
             Debug.LogError("Client Device Data is not enabled");
             Client.EnableDeviceData();
         }
