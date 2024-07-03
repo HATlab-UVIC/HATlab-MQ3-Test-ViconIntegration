@@ -11,6 +11,8 @@ public class Meta_Quest_Markers_Manager : MonoBehaviour
     [SerializeField] List<Meta_Quest_Markers> TrackedMetaQuestSubjects;
     [SerializeField] Transform CenterEyeAnchor;
     Meta_Quest_Markers Root_Meta_Quest_Marker;
+    public ViconDataStreamClient Client;
+    private bool calibrated = false;
 
     Vector3 TransformVector;
     Vector3 ViconWorldScaleIPD; // InterPupillary Distance in Vicon Coordinate System
@@ -39,12 +41,22 @@ public class Meta_Quest_Markers_Manager : MonoBehaviour
 
     void OnEnable()
     {
-        GameEvents.OnCalibrationInvoked += Calibrate;
+        // GameEvents.OnCalibrationInvoked += Calibrate;
     }
 
     void OnDisable()
     {
-        GameEvents.OnCalibrationInvoked -= Calibrate;
+        // GameEvents.OnCalibrationInvoked -= Calibrate;
+    }
+
+    private void Update()
+    {
+        if (Client.IsDeviceDataEnabled().Enabled && !calibrated)
+        {
+            DebugConsole.Success("Calibrate!");
+            Calibrate();
+            calibrated = true;
+        }
     }
 
     public void Calibrate()

@@ -93,7 +93,7 @@ public class Analog_Input : MonoBehaviour
             {
                 IsReadingInput = false;
                 DebugConsole.Error("Device Data is not enabled");
-                DebugConsole.Log("Trying enabling Deice Data...");
+                DebugConsole.Log("Trying enabling Device Data...");
                 Client.EnableDeviceData();
                 if (Client.IsDeviceDataEnabled().Enabled)
                 {
@@ -101,11 +101,11 @@ public class Analog_Input : MonoBehaviour
                 }
                 else
                 {
-                    DebugConsole.Error("Device Data is cannot be enabled");
+                    DebugConsole.Error("Device Data cannot be enabled");
                 }
             }
 
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(1.1f);
         }
     }
 }
