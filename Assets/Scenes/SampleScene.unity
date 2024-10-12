@@ -891,7 +891,23 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2483171112407822886, guid: f54012181eacade4ea242c65f804720f, type: 3}
+      propertyPath: enableDynamicResolution
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2483171112407822886, guid: f54012181eacade4ea242c65f804720f, type: 3}
+      propertyPath: maxDynamicResolutionScale
+      value: 1.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2483171112407822886, guid: f54012181eacade4ea242c65f804720f, type: 3}
+      propertyPath: minDynamicResolutionScale
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2483171112407822886, guid: f54012181eacade4ea242c65f804720f, type: 3}
       propertyPath: isInsightPassthroughEnabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2483171112407822886, guid: f54012181eacade4ea242c65f804720f, type: 3}
+      propertyPath: requestScenePermissionOnStartup
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2514675399181695721, guid: f54012181eacade4ea242c65f804720f, type: 3}
@@ -948,7 +964,21 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2483171112401766338, guid: f54012181eacade4ea242c65f804720f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1899886326}
+    - targetCorrespondingSourceObject: {fileID: 2483171112401766338, guid: f54012181eacade4ea242c65f804720f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1899886327}
   m_SourcePrefab: {fileID: 100100000, guid: f54012181eacade4ea242c65f804720f, type: 3}
+--- !u!114 &1160299848 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2483171112407822892, guid: f54012181eacade4ea242c65f804720f, type: 3}
+  m_PrefabInstance: {fileID: 1160299847}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1899886321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df9f338034892c44ebb62d97894772f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1179690283
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1117,6 +1147,7 @@ MonoBehaviour:
   metaQuestMarkersManager: {fileID: 1182727464}
   walkwayMaterial: {fileID: 2100000, guid: ca42b184beb242042b5c634e50f63356, type: 2}
   height: 0.05
+  IsInstantiated: 0
 --- !u!1 &1232912915
 GameObject:
   m_ObjectHideFlags: 0
@@ -2148,6 +2179,21 @@ MonoBehaviour:
   edgeRenderingEnabled_: 0
   edgeColor_: {r: 1, g: 1, b: 1, a: 1}
   colorMapType: 0
+--- !u!114 &1899886327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1899886321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71a155ece80369d4e99bdaf5e59169b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _occlusionShadersMode: 2
+  _removeHands: 0
+  _cameraRig: {fileID: 1160299848}
 --- !u!4 &1914773763 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8835702587616806480, guid: 3e881cea5e63052499e9a19454dacb94, type: 3}
