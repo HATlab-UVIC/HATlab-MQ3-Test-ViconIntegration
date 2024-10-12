@@ -9,16 +9,34 @@ public class WalkwayCube : MonoBehaviour
     [SerializeField] private Meta_Quest_Markers_Manager metaQuestMarkersManager;
     [SerializeField] private Material walkwayMaterial;
     [SerializeField] float height = 0.05f;
-
+    public bool IsInstantiated = false;
     private List<Transform> anchors;
+    private Transform instantiatedWalkway;
+    private float time = 0f;
 
     private void Start()
     {
         anchors = new List<Transform>();
     }
 
-    public void InstantiateWalkway()
-    {
+    private void Update() {
+        if (IsInstantiated && time > 1)
+        {
+            UpdateWalkway();
+            time = 0f;
+        }
+        else
+        {
+            time += Time.deltaTime;
+        }
+    }
+
+    public void SetISInstantiatedWalkwayTrue() {
+        InstantiateWalkway();
+        IsInstantiated = true;
+    }
+
+    private void UpdateWalkway() {
         List<Meta_Quest_Markers> trackedSubjects;
         trackedSubjects = metaQuestMarkersManager.GetTrackedMetaQuestSubjects();
         DebugConsole.Log($"There are {trackedSubjects.Count} tracked subjects.");
@@ -40,7 +58,7 @@ public class WalkwayCube : MonoBehaviour
         walkwayMesh.vertices = new[]
         {
             // down side
-            anchors[0].position, 
+            anchors[0].position,
             anchors[1].position,
             anchors[2].position,
             anchors[3].position,
@@ -120,8 +138,13 @@ public class WalkwayCube : MonoBehaviour
         walkwayMesh.Optimize();
         walkwayMesh.RecalculateNormals();
 
-        var instantiatedWalkway = Instantiate(walkway, Vector3.zero, Quaternion.identity);
         instantiatedWalkway.GetComponent<MeshFilter>().mesh = walkwayMesh;
         instantiatedWalkway.GetComponent<MeshRenderer>().material = walkwayMaterial;
+    }
+
+    private void InstantiateWalkway()
+    {
+        instantiatedWalkway = Instantiate(walkway, Vector3.zero, Quaternion.identity).transform;
+        UpdateWalkway();
     }
 }

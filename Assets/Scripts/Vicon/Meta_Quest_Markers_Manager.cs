@@ -155,7 +155,7 @@ public class Meta_Quest_Markers_Manager : MonoBehaviour
 
         // Apply linear transform matrixes to ViconWorldTransformation to calculate real world distance between center eye anchor and IPD center of front markers
         ViconWorldTransformation = ScaleMatrix.MultiplyPoint3x4(RotateY.MultiplyPoint3x4(ViconWorldTransformation));
-        TransformVector = RealWorldTransformation - ViconWorldTransformation + new Vector3(0, 0, 0f);
+        TransformVector = RealWorldTransformation - ViconWorldTransformation + new Vector3(0f, 0f, 0.08f);
 
         Debug.LogError($"TransformVector: {TransformVector} RealWorldTransformation: {RealWorldTransformation} ViconWorldTransformation: {ViconWorldTransformation}");
 
@@ -176,11 +176,11 @@ public class Meta_Quest_Markers_Manager : MonoBehaviour
             TrackedSubject.CalibrateScaleMatrix = ScaleMatrix;
             TrackedSubject.CalibrateTransformMatrix = TransformVector;
         }
-        // StartCoroutine(InvokealkwayCube());
+        StartCoroutine(InvokealkwayCube());
     }
     IEnumerator InvokealkwayCube()
     {
         yield return new WaitForSeconds(1);
-        walkwayCube.InstantiateWalkway();
+        walkwayCube.SetISInstantiatedWalkwayTrue();
     }
 }
