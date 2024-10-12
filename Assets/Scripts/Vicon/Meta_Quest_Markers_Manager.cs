@@ -8,25 +8,26 @@ using UnityVicon;
 
 public class Meta_Quest_Markers_Manager : MonoBehaviour
 {
-    [SerializeField] List<Meta_Quest_Markers> TrackedMetaQuestSubjects;
-    [SerializeField] Transform CenterEyeAnchor;
-    Meta_Quest_Markers Root_Meta_Quest_Marker;
-    public ViconDataStreamClient Client;
+    [SerializeField] private List<Meta_Quest_Markers> TrackedMetaQuestSubjects;
+    [SerializeField] private Transform CenterEyeAnchor;
+    [SerializeField] private WalkwayCube walkwayCube;
+    private Meta_Quest_Markers Root_Meta_Quest_Marker;
     private bool calibrated = false;
+    public ViconDataStreamClient Client;
 
-    Vector3 TransformVector;
-    Vector3 ViconWorldScaleIPD; // InterPupillary Distance in Vicon Coordinate System
-    Vector3 ViconWorldTransformation;
-    Vector3 RealWorldScaleIPD; // InterPupillary Distance in Meta Quest Coordinate System. This is matching the real world coordinate system
-    Vector3 RealWorldTransformation;
+    private Vector3 TransformVector;
+    private Vector3 ViconWorldScaleIPD; // InterPupillary Distance in Vicon Coordinate System
+    private Vector3 ViconWorldTransformation;
+    private Vector3 RealWorldScaleIPD; // InterPupillary Distance in Meta Quest Coordinate System. This is matching the real world coordinate system
+    private Vector3 RealWorldTransformation;
 
-    Matrix4x4 RotateX;
-    Matrix4x4 RotateY;
-    Matrix4x4 RotateZ;
-    Matrix4x4 ScaleMatrix;
-    Matrix4x4 SwizzleYandZ;
+    private Matrix4x4 RotateX;
+    private Matrix4x4 RotateY;
+    private Matrix4x4 RotateZ;
+    private Matrix4x4 ScaleMatrix;
+    private Matrix4x4 SwizzleYandZ;
 
-    void Start()
+    private void Start()
     {
         foreach (var TrackedSubject in TrackedMetaQuestSubjects)
         {
@@ -39,12 +40,12 @@ public class Meta_Quest_Markers_Manager : MonoBehaviour
         if (Root_Meta_Quest_Marker == null) DebugConsole.Error("There is no Root in Tracked Meta Quest Subjects");
     }
 
-    void OnEnable()
+    private void OnEnable()
     {
         // GameEvents.OnCalibrationInvoked += Calibrate;
     }
 
-    void OnDisable()
+    private void OnDisable()
     {
         // GameEvents.OnCalibrationInvoked -= Calibrate;
     }
@@ -58,6 +59,11 @@ public class Meta_Quest_Markers_Manager : MonoBehaviour
             calibrated = true;
         }
     }
+
+    public List<Meta_Quest_Markers> GetTrackedMetaQuestSubjects() {
+        return TrackedMetaQuestSubjects;
+    }
+
 
     public void Calibrate()
     {
@@ -170,5 +176,11 @@ public class Meta_Quest_Markers_Manager : MonoBehaviour
             TrackedSubject.CalibrateScaleMatrix = ScaleMatrix;
             TrackedSubject.CalibrateTransformMatrix = TransformVector;
         }
+        // StartCoroutine(InvokealkwayCube());
+    }
+    IEnumerator InvokealkwayCube()
+    {
+        yield return new WaitForSeconds(1);
+        walkwayCube.InstantiateWalkway();
     }
 }
