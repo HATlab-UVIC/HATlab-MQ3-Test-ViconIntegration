@@ -26,6 +26,7 @@ MonoBehaviour:
   eyeTrackingSupport: 0
   virtualKeyboardSupport: 0
   sceneSupport: 2
+  boundaryVisibilitySupport: 0
   disableBackups: 1
   enableNSCConfig: 1
   securityXmlPath: 
@@ -39,6 +40,6 @@ MonoBehaviour:
   _processorFavor: 0
   systemSplashScreen: {fileID: 0}
   systemSplashScreenType: 0
-  _systemLoadingScreenBackground: 0
-  ovrPluginMd5Win64: 9622adb0c825689c7a69d4de80ae2f0e7bb6b57fccb20af96a72fce1ab3cbc2a
-  ovrPluginMd5Android: 01d89b6385c0568f3a175449d4370ee0e454c924d3e083b42e26aeee253c2993
+  _systemLoadingScreenBackground: 1
+  ovrPluginMd5Win64: aa662cdf2f901973cc80422bf87a766da20fb939aacfe258752e357061d8b403
+  ovrPluginMd5Android: b191da349d7c05c640e5f41721d8abdf254d4d8320f8ad1cf0b1342405e2e756
