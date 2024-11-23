@@ -27,6 +27,8 @@ public class Meta_Quest_Markers_Manager : MonoBehaviour
     private Matrix4x4 ScaleMatrix;
     private Matrix4x4 SwizzleYandZ;
 
+    private float _timeElapsedSinceLastErrorCalibration = 0f;
+
     private void Start()
     {
         foreach (var TrackedSubject in TrackedMetaQuestSubjects)
@@ -50,18 +52,38 @@ public class Meta_Quest_Markers_Manager : MonoBehaviour
         // GameEvents.OnCalibrationInvoked -= Calibrate;
     }
 
+    private void OnDestroy() {
+        StopCoroutine(InvokeWalkwayCube());
+    }
+
     private void Update()
     {
-        if (Client.IsDeviceDataEnabled().Enabled && !calibrated)
+        _timeElapsedSinceLastErrorCalibration += Time.deltaTime;
+        /*if (Client.IsDeviceDataEnabled().Enabled && !calibrated)
         {
             DebugConsole.Success("Calibrate!");
             Calibrate();
-            calibrated = true;
+        }*/
+        DebugLines();
+        if (Client.IsMarkerDataEnabled() && calibrated)
+        {
+            if (_timeElapsedSinceLastErrorCalibration > 1f)
+            {
+                _timeElapsedSinceLastErrorCalibration = 0f;
+                ErrorTransformCalibration();
+            }
         }
     }
 
     public List<Meta_Quest_Markers> GetTrackedMetaQuestSubjects() {
         return TrackedMetaQuestSubjects;
+    }
+
+    private void DebugLines() {
+        Debug.DrawLine(Vector3.zero, RealWorldTransformation, Color.yellow);
+        Debug.DrawLine(Vector3.zero, TransformVector, Color.green);
+        Debug.DrawLine(Vector3.zero, ViconWorldTransformation, Color.blue);
+        Debug.DrawLine(ViconWorldTransformation, ViconWorldTransformation + TransformVector, Color.red);
     }
 
 
@@ -87,23 +109,24 @@ public class Meta_Quest_Markers_Manager : MonoBehaviour
         }
 
 
-
         ViconWorldScaleIPD = Root_Meta_Quest_Marker.transform.GetChild(1).position - Root_Meta_Quest_Marker.transform.GetChild(0).position;
         ViconWorldTransformation = (Root_Meta_Quest_Marker.transform.GetChild(0).position + Root_Meta_Quest_Marker.transform.GetChild(1).position) / 2;
-        RealWorldScaleIPD = CenterEyeAnchor.right * 13; // The distance between marker HMD1 and marker HMD2 is around 13cm
+        RealWorldScaleIPD = CenterEyeAnchor.right * 11; // The distance between marker HMD1 and marker HMD2 is around 13cm
         RealWorldTransformation = CenterEyeAnchor.position;
 
         // Swizzle Vicon Coordinate System into World Coordinate System
         ViconWorldScaleIPD = new Vector3(ViconWorldScaleIPD.x, ViconWorldScaleIPD.z, ViconWorldScaleIPD.y);
         ViconWorldTransformation = new Vector3(ViconWorldTransformation.x, ViconWorldTransformation.z, ViconWorldTransformation.y);
 
-        float ViconToWorldScale = 0.13f / ViconWorldScaleIPD.magnitude;
         float angleX, angleY, angleZ;
 
         // Calculate angles in 3 axis between ViconWorldScaleIPD and RealWorldScaleIPD
         angleX = Vector3.Angle(new Vector3(0, RealWorldScaleIPD.y, RealWorldScaleIPD.z), new Vector3(0, ViconWorldScaleIPD.y, ViconWorldScaleIPD.z)) * Mathf.PI / 180;
-        angleY = -Vector3.Angle(new Vector3(RealWorldScaleIPD.x, 0, RealWorldScaleIPD.z), new Vector3(ViconWorldScaleIPD.x, 0, ViconWorldScaleIPD.z)) * Mathf.PI / 180;
+        angleY = - Vector3.Angle(new Vector3(RealWorldScaleIPD.x, 0, RealWorldScaleIPD.z), new Vector3(ViconWorldScaleIPD.x, 0, ViconWorldScaleIPD.z)) * Mathf.PI / 180;
         angleZ = Vector3.Angle(new Vector3(RealWorldScaleIPD.x, RealWorldScaleIPD.y, 0), new Vector3(ViconWorldScaleIPD.x, ViconWorldScaleIPD.y, 0)) * Mathf.PI / 180;
+
+        DebugConsole.Log($"angleX: {angleX * 180 / Mathf.PI} angleY: {angleY * 180 / Mathf.PI} angleZ: {angleZ * 180 / Mathf.PI}");
+
 
         // Debug.LogError($"ViconWorldScaleIPD: {ViconWorldScaleIPD.normalized} RealWorldScaleIPD: {RealWorldScaleIPD.normalized}");
         // Debug.LogError($"angleX: {angleX * 180 / Mathf.PI} angleY: {angleY * 180 / Mathf.PI} angleZ: {angleZ * 180 / Mathf.PI}");
@@ -147,19 +170,24 @@ public class Meta_Quest_Markers_Manager : MonoBehaviour
         RotateZ.SetColumn(3, new Vector4(0, 0, 0, 1));
 
         ScaleMatrix = new Matrix4x4();
-        ScaleMatrix.SetColumn(0, new Vector4(0.001f, 0, 0, 0));
-        ScaleMatrix.SetColumn(1, new Vector4(0, 0.001f, 0, 0));
-        ScaleMatrix.SetColumn(2, new Vector4(0, 0, 0.001f, 0));
+        float _scaleRatioFromViconToRealWorld = Vector3.Magnitude(RealWorldTransformation) / Vector3.Magnitude(ViconWorldTransformation);
+        DebugConsole.Log($"Scale ratio from Vicon to Real World: {_scaleRatioFromViconToRealWorld}");
+        ScaleMatrix.SetColumn(0, new Vector4(_scaleRatioFromViconToRealWorld, 0, 0, 0));
+        ScaleMatrix.SetColumn(1, new Vector4(0, _scaleRatioFromViconToRealWorld, 0, 0));
+        ScaleMatrix.SetColumn(2, new Vector4(0, 0, _scaleRatioFromViconToRealWorld, 0));
         ScaleMatrix.SetColumn(3, new Vector4(0, 0, 0, 1));
 
 
         // Apply linear transform matrixes to ViconWorldTransformation to calculate real world distance between center eye anchor and IPD center of front markers
-        ViconWorldTransformation = ScaleMatrix.MultiplyPoint3x4(RotateY.MultiplyPoint3x4(ViconWorldTransformation));
-        TransformVector = RealWorldTransformation - ViconWorldTransformation + new Vector3(0f, 0f, 0.08f);
+        // ViconWorldTransformation = ScaleMatrix.MultiplyPoint3x4(RotateY.MultiplyPoint3x4(ViconWorldTransformation));
+        // TransformVector = RealWorldTransformation - ViconWorldTransformation + new Vector3(0f, 0f, 0.08f);
+        TransformVector = RealWorldTransformation - ViconWorldTransformation;
 
-        Debug.LogError($"TransformVector: {TransformVector} RealWorldTransformation: {RealWorldTransformation} ViconWorldTransformation: {ViconWorldTransformation}");
+        // Debug.LogError($"TransformVector: {TransformVector} RealWorldTransformation: {RealWorldTransformation} ViconWorldTransformation: {ViconWorldTransformation}");
 
-
+        DebugConsole.Log("Error: " + TransformVector.ToString());
+        DebugConsole.Log("Vicon transformation: " + ViconWorldTransformation.ToString());
+        DebugConsole.Log("World transformation: " + RealWorldTransformation.ToString());
 
         // Debug.LogError($"Calibrate Rotation Matrix \n{RotateZ * (RotateY * RotateX)}");
         // Debug.LogError($"RotateY Matrix \n{RotateY}");
@@ -169,18 +197,35 @@ public class Meta_Quest_Markers_Manager : MonoBehaviour
         foreach (var TrackedSubject in TrackedMetaQuestSubjects)
         {
             TrackedSubject.CalibrateSwizzleMatrix = SwizzleYandZ;
-            // TrackedSubject.CalibratedRotateMatrix = RotateZ * (RotateY * RotateX);
-            // TrackedSubject.CalibratedRotateXMatrix = RotateX;
+            // TrackedSubject.CalibrateRotateXMatrix = RotateX;
             TrackedSubject.CalibrateRotateYMatrix = RotateY;
-            // TrackedSubject.CalibratedRotateZMatrix = RotateZ;
+            // TrackedSubject.CalibrateRotateZMatrix = RotateZ;
             TrackedSubject.CalibrateScaleMatrix = ScaleMatrix;
-            TrackedSubject.CalibrateTransformMatrix = TransformVector;
+            TrackedSubject.CalibrateTransformMatrix = TransformVector * _scaleRatioFromViconToRealWorld;
         }
-        StartCoroutine(InvokealkwayCube());
+        if (!calibrated)
+        {
+            StartCoroutine(InvokeWalkwayCube());
+        }
+        calibrated = true;
     }
-    IEnumerator InvokealkwayCube()
+    IEnumerator InvokeWalkwayCube()
     {
         yield return new WaitForSeconds(1);
         walkwayCube.SetISInstantiatedWalkwayTrue();
+    }
+
+    private void ErrorTransformCalibration() {
+        RealWorldTransformation = CenterEyeAnchor.position;
+        ViconWorldTransformation = (Root_Meta_Quest_Marker.transform.GetChild(0).position + Root_Meta_Quest_Marker.transform.GetChild(1).position) / 2;
+
+        TransformVector = RealWorldTransformation - ViconWorldTransformation;
+        DebugConsole.Log("RealWorldTransformation: " + RealWorldTransformation);
+        DebugConsole.Log("ViconWorldTransformation: " + ViconWorldTransformation);
+        DebugConsole.Log("Error: " + (TransformVector).ToString());
+        foreach (var TrackedSubject in TrackedMetaQuestSubjects)
+        {
+            TrackedSubject.CalibrateTransformMatrix += TransformVector;
+        }
     }
 }

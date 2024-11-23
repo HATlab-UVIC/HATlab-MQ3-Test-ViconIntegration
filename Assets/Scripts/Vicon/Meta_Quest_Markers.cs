@@ -79,12 +79,26 @@ namespace UnityVicon
                 // root.position = CalibratedRotateMatrix.MultiplyPoint3x4( CalibratedSwizzleMatrix.MultiplyPoint3x4( Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName) ) );
                 // root.position = CalibratedRotateMatrix.MultiplyPoint3x4( Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName) );
                 // root.position = CalibratedSwizzleMatrix.MultiplyPoint3x4( Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName) );
+                /*root.position =
+                    CalibrateScaleMatrix.MultiplyPoint3x4(
+                    CalibrateRotateZMatrix.MultiplyPoint3x4(
+                    CalibrateRotateYMatrix.MultiplyPoint3x4(
+                    CalibrateRotateXMatrix.MultiplyPoint3x4(
+                    CalibrateSwizzleMatrix.MultiplyPoint3x4(
+                        Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName)
+                        ))))) + CalibrateTransformMatrix;*/
+
                 root.position =
                     CalibrateScaleMatrix.MultiplyPoint3x4(
                     CalibrateRotateZMatrix.MultiplyPoint3x4(
                     CalibrateRotateYMatrix.MultiplyPoint3x4(
                     CalibrateRotateXMatrix.MultiplyPoint3x4(
-                    CalibrateSwizzleMatrix.MultiplyPoint3x4(Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName)))))) + CalibrateTransformMatrix;
+                    CalibrateSwizzleMatrix.MultiplyPoint3x4(
+                        Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName)
+                        ))))) + CalibrateTransformMatrix;
+
+                // root.position = CalibrateScaleMatrix.MultiplyPoint3x4(Client.GetMarkerGlobalTranslationVector3(SubjectName, MarkerName)) + CalibrateTransformMatrix;
+
                 double[] rot = Client.GetSegmentRotation(SubjectName, SegmentName).Rotation;
                 root.rotation = new Quaternion((float)rot[0], (float)rot[1], (float)rot[2], (float)rot[3]);
                 double[] scale = Client.GetSegmentScale(SubjectName, SegmentName).Scale;

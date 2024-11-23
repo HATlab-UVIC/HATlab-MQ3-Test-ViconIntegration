@@ -471,6 +471,17 @@ public class ViconDataStreamClient : MonoBehaviour
         }
     }
 
+    public bool IsMarkerDataEnabled() {
+        if (IsRetimed)
+        {
+            return false;
+        }
+        else
+        {
+            return m_Client.IsMarkerDataEnabled().Enabled;
+        }
+    }
+
     public uint GetNumberOfMarkers(string SubjectName)
     {
         if (m_Client.IsMarkerDataEnabled().Enabled && !IsRetimed)

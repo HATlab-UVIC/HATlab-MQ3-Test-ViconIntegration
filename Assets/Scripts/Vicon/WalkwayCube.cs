@@ -39,7 +39,7 @@ public class WalkwayCube : MonoBehaviour
     private void UpdateWalkway() {
         List<Meta_Quest_Markers> trackedSubjects;
         trackedSubjects = metaQuestMarkersManager.GetTrackedMetaQuestSubjects();
-        DebugConsole.Log($"There are {trackedSubjects.Count} tracked subjects.");
+        // DebugConsole.Log($"There are {trackedSubjects.Count} tracked subjects.");
 
         foreach (var subject in trackedSubjects)
         {
@@ -47,7 +47,7 @@ public class WalkwayCube : MonoBehaviour
             {
                 anchors.Add(subject.transform.GetChild(0));
                 Debug.Log($"Subject's child's position: {subject.transform.GetChild(0).position}");
-                DebugConsole.Log($"Subject {subject.gameObject.name} was added to the Walkway anchors.");
+                // DebugConsole.Log($"Subject {subject.gameObject.name} was added to the Walkway anchors.");
             }
         }
 
